@@ -23,6 +23,24 @@ const decodeServerSettingsPatch = Schema.decodeUnknownSync(ServerSettingsPatch);
 const encodeServerSettings = Schema.encodeSync(ServerSettings);
 const decodeClaudeSettings = Schema.decodeUnknownSync(ClaudeSettings);
 
+describe("Pull request creation settings", () => {
+  it("keeps PR creation enabled for existing installations", () => {
+    expect(decodeServerSettings({}).pullRequestCreationEnabled).toBe(true);
+  });
+
+  it.each([true, false])(
+    "round-trips %s globally and per project",
+    (pullRequestCreationEnabled) => {
+      const input = {
+        pullRequestCreationEnabled,
+        projectSettingsOverrides: { project: { pullRequestCreationEnabled } },
+      };
+      expect(encodeServerSettings(decodeServerSettings(input))).toMatchObject(input);
+      expect(decodeServerSettingsPatch(input)).toEqual(input);
+    },
+  );
+});
+
 describe("Changes scope settings", () => {
   it("preserves branch changes for existing installations", () => {
     expect(decodeServerSettings({}).changesScope).toBe("branch");
