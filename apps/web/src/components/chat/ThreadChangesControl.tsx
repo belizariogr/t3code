@@ -2,7 +2,6 @@ import { formatDiffCount } from "@t3tools/client-runtime/diff-count";
 import { getLatestCompletedCheckpointTurnCount } from "@t3tools/client-runtime/state/thread-checkpoints";
 import type { ChangesScope, ScopedThreadRef, VcsStatusResult } from "@t3tools/contracts";
 import { FileDiffIcon } from "lucide-react";
-import { useMemo } from "react";
 
 import { useClientSettings } from "../../hooks/useSettings";
 import { useCheckpointDiff } from "../../lib/checkpointDiffState";
@@ -29,10 +28,9 @@ export function ThreadChangesControl({
 }) {
   const projection = useThreadProjection(scope === "thread" ? threadRef : null)?.projection ?? null;
   const hasProjection = projection !== null;
-  const latestCompletedCheckpointTurnCount = useMemo(
-    () =>
-      getLatestCompletedCheckpointTurnCount(projection?.checkpoints ?? [], projection?.runs ?? []),
-    [projection],
+  const latestCompletedCheckpointTurnCount = getLatestCompletedCheckpointTurnCount(
+    projection?.checkpoints ?? [],
+    projection?.runs ?? [],
   );
   const ignoreWhitespace = useClientSettings((settings) => settings.diffIgnoreWhitespace);
   const { canReadFiles } = useFilesystemReadAccess(threadRef?.environmentId ?? null);
@@ -47,7 +45,7 @@ export function ThreadChangesControl({
     { enabled: scope === "thread" && latestCompletedCheckpointTurnCount > 0 && canReadFiles },
   );
   // Use the net checkpoint diff: summing turn totals double-counts edits and reversals.
-  const threadTotals = useMemo(() => {
+  const threadTotals = (() => {
     if (hasProjection && latestCompletedCheckpointTurnCount === 0) {
       return { insertions: 0, deletions: 0 };
     }
@@ -56,7 +54,7 @@ export function ThreadChangesControl({
     if (patch?.kind === "raw") return null;
     const totals = getDiffLineStat(patch?.files ?? []);
     return { insertions: totals.additions, deletions: totals.deletions };
-  }, [diff.data, latestCompletedCheckpointTurnCount, hasProjection]);
+  })();
   const totals =
     scope === "thread"
       ? threadTotals
