@@ -532,6 +532,12 @@ export const SETTINGS_SEARCH_ITEMS = [
     desktopOnly: true,
   },
   {
+    id: "mobile-app",
+    title: "Mobile app",
+    to: "/settings/general",
+    searchTerms: ["phone tablet iPhone iPad iOS Android App Store Google Play QR"],
+  },
+  {
     id: "privacy-policy",
     title: "Privacy policy",
     to: "/settings/general",
@@ -789,6 +795,13 @@ export const SETTINGS_SEARCH_ITEMS = [
     searchTerms: [
       "version control git github gitlab forgejo gitea tea codeberg bitbucket azure devops hosting integrations credentials scan server environment",
     ],
+  },
+  {
+    id: "pull-request-creation",
+    title: "Pull request creation",
+    to: "/settings/source-control",
+    scope: "project-defaults",
+    searchTerms: ["disable hide pr merge request commit push feature branch"],
   },
   {
     id: "git-fetch-interval",

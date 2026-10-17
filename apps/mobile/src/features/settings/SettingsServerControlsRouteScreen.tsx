@@ -53,6 +53,7 @@ const PAGE_PROJECT_KEYS: Record<SettingsPage, readonly ProjectScopedServerSettin
   "new-threads": ["defaultThreadEnvMode", "worktreeSubmodules", "defaultRuntimeMode"],
   "source-control": [
     "changesScope",
+    "pullRequestCreationEnabled",
     "defaultAutoPull",
     "removeAgentCreditsOnMerge",
     "newWorktreesStartFromOrigin",
@@ -400,6 +401,14 @@ function ServerSettingsDetail(props: { readonly page: SettingsPage }) {
                     onChange={write}
                   />
                   <SettingsSection title="Pull requests">
+                    <SettingsSwitchRow
+                      icon="arrow.triangle.pull"
+                      label="Pull request creation"
+                      subtitle="Show pull request creation in source control actions. Turn off to only commit and push from feature branches."
+                      value={uniform("pullRequestCreationEnabled")}
+                      disabled={disabledFor("pullRequestCreationEnabled")}
+                      onValueChange={(value) => write({ pullRequestCreationEnabled: value })}
+                    />
                     <SettingsSwitchRow
                       icon="arrow.triangle.merge"
                       label="Remove agent credits when merging"

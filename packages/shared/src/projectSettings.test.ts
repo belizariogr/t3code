@@ -39,6 +39,32 @@ describe("resolveProjectSettings", () => {
     expect(resolveProjectSettings(cleared, projectId).settings.changesScope).toBe("uncommitted");
     expect(resolveProjectSettings(cleared, projectId).sources.changesScope).toBe("environment");
   });
+  it("inherits PR creation and restores it when a project override is cleared", () => {
+    const settings = applyServerSettingsPatch(DEFAULT_SERVER_SETTINGS, {
+      pullRequestCreationEnabled: false,
+      projectSettingsOverrides: { [projectId]: { pullRequestCreationEnabled: true } },
+    });
+    expect(resolveProjectSettings(settings, projectId).settings.pullRequestCreationEnabled).toBe(
+      true,
+    );
+    expect(
+      resolveProjectSettings(settings, otherProjectId).settings.pullRequestCreationEnabled,
+    ).toBe(false);
+    const cleared = applyServerSettingsPatch(settings, {
+      projectSettingsOverrides: {
+        [projectId]: clearProjectSettingsOverrides(settings, projectId, [
+          "pullRequestCreationEnabled",
+        ]),
+      },
+    });
+    expect(resolveProjectSettings(cleared, projectId).settings.pullRequestCreationEnabled).toBe(
+      false,
+    );
+    expect(resolveProjectSettings(cleared, projectId).sources.pullRequestCreationEnabled).toBe(
+      "environment",
+    );
+  });
+
   it("inherits every scopable key when the project has no overrides", () => {
     const resolved = resolveProjectSettings(DEFAULT_SERVER_SETTINGS, projectId);
     expect(resolved.settings).toBe(DEFAULT_SERVER_SETTINGS);
